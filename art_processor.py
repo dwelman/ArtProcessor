@@ -53,6 +53,9 @@ def main(argv):
         if input_image == None:
             print('File {} could not be opened'.format(filename))
             exit(-1)
+
+        #Save an RGB copy of the input image in-case it has any transparency
+        rgb_image = input_image.convert("RGB") if input_image.mode in ('RGBA', 'P') else input_image
         
         print('Processing image {}/{}'.format(image_index + 1, image_total))
 
@@ -60,27 +63,35 @@ def main(argv):
 
         # Create the various outputs I want
         # Save original as is, in both png and jpeg
-        print('Saving originals')
-        input_image.save('{}/{}-orig.png'.format(output_dir, new_filename))
-        input_image.save('{}/{}-orig.jpeg'.format(output_dir, new_filename))
+        try:
+            print('Saving originals')
+            input_image.save('{}/{}-orig.png'.format(output_dir, new_filename))
+            rgb_image.save('{}/{}-orig.jpeg'.format(output_dir, new_filename))
+        except Exception as e: print('Failed to process image: {}'.format(e)) 
 
         # Downscale the image, save to png and jpeg
-        print('Saving downscaled originals')
-        downscale_out = input_image.resize(tuple(round(i / 4) for i in input_image.size))
-        downscale_out.save('{}/{}-orig-downscaled.png'.format(output_dir, new_filename))
-        downscale_out.save('{}/{}-orig-downscaled.jpeg'.format(output_dir, new_filename))
+        try:
+            print('Saving downscaled originals')
+            downscale_out = input_image.resize(tuple(round(i / 4) for i in input_image.size))
+            downscale_out.save('{}/{}-orig-downscaled.png'.format(output_dir, new_filename))
+            rgb_image.save('{}/{}-orig-downscaled.jpeg'.format(output_dir, new_filename))
+        except Exception as e: print('Failed to process image: {}'.format(e))  
 
         # Rotate the image to the left, save to png and jpeg
-        print('Saving rotated originals')
-        rotated_out = input_image.rotate(90, expand=True)
-        rotated_out.save('{}/{}-rot.png'.format(output_dir, new_filename))
-        rotated_out.save('{}/{}-rot.jpeg'.format(output_dir, new_filename))
+        try:
+            print('Saving rotated originals')
+            rotated_out = input_image.rotate(90, expand=True)
+            rotated_out.save('{}/{}-rot.png'.format(output_dir, new_filename))
+            rgb_image.save('{}/{}-rot.jpeg'.format(output_dir, new_filename))
+        except Exception as e: print('Failed to process image: {}'.format(e))  
 
         # Finally, rotate the downscaled images
-        print('Saving rotated downscaled originals')
-        rotated_out = downscale_out.rotate(90, expand=True)
-        rotated_out.save('{}/{}-rot-downscaled.png'.format(output_dir, new_filename))
-        rotated_out.save('{}/{}-rot-downscaled.jpeg'.format(output_dir, new_filename))
+        try:
+            print('Saving rotated downscaled originals')
+            rotated_out = downscale_out.rotate(90, expand=True)
+            rotated_out.save('{}/{}-rot-downscaled.png'.format(output_dir, new_filename))
+            rgb_image.save('{}/{}-rot-downscaled.jpeg'.format(output_dir, new_filename))
+        except Exception as e: print('Failed to process image: {}'.format(e))  
 
         image_index += 1
 
